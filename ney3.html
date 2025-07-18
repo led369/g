@@ -42,18 +42,15 @@
       box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
     }
 
-    #video, #snapshot {
-      margin-top: 20px;
-      border-radius: 20px;
-      display: none;
-    }
-
     #message {
-      font-size: 24px;
+      font-size: 26px;
       color: white;
-      margin-top: 30px;
+      margin-top: 40px;
       text-align: center;
-      max-width: 400px;
+      max-width: 500px;
+      line-height: 1.6;
+      font-weight: bold;
+      animation: fadeIn 2s ease-in;
     }
 
     .heart {
@@ -71,10 +68,9 @@
     }
 
     iframe#music {
-      margin-top: 20px;
-      border: none;
       width: 0;
       height: 0;
+      border: 0;
       display: none;
     }
   </style>
@@ -83,8 +79,6 @@
   <h1>Plotësoje puzzle-n Krric ❤️</h1>
 
   <canvas id="puzzle" width="300" height="300"></canvas>
-  <video id="video" width="300" height="300" autoplay></video>
-  <canvas id="snapshot" width="300" height="300" style="display:none; border: 3px solid #ff69b4; border-radius: 20px;"></canvas>
   <div id="message"></div>
 
   <iframe
@@ -99,8 +93,7 @@
     const ctx = canvas.getContext('2d');
     const rows = 3, cols = 3;
     const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGVhEYWaff2RH_MrWZAOG02-sJ3hxJGHNB1A&s";
+    img.src = "9afa47f9-5646-4564-87a9-e1dec19bdd0a.png"; // Fotoja juaj
 
     let pieces = [];
     let isComplete = false;
@@ -158,45 +151,19 @@
     }
 
     function onComplete() {
-      // Ndalo ndërveprimin
-      canvas.style.pointerEvents = "none";
-      // Fshi puzzle dhe pastro ekranin
-      setTimeout(() => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        canvas.style.display = "none";
-        startCamera();
-      }, 1000);
-
-      // Muzika
+      canvas.style.display = 'none';
       document.getElementById('music').style.display = 'block';
-
-      // Bëj foton pas 4 sekondash
-      setTimeout(() => {
-        capturePhoto();
-      }, 4000);
-    }
-
-    function startCamera() {
-      const video = document.getElementById('video');
-      video.style.display = 'block';
-      navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream => video.srcObject = stream)
-        .catch(err => console.error('Gabim në kamerë:', err));
-    }
-
-    function capturePhoto() {
-      const video = document.getElementById('video');
-      const canvasSnap = document.getElementById('snapshot');
-      const ctxSnap = canvasSnap.getContext('2d');
-      ctxSnap.drawImage(video, 0, 0, canvasSnap.width, canvasSnap.height);
-      video.style.display = 'none';
-      canvasSnap.style.display = 'block';
       showMessage();
     }
 
     function showMessage() {
       const msg = document.getElementById('message');
-      msg.innerHTML = "<b>Krric ❤️<br>Më fal që ndonjëherë tregohem si derr...<br>Je gjithçka për mua 💖</b>";
+      msg.innerHTML = `
+        PS: InshaaAllah vjen sa më shpejt dita kur do vijmë në jetë bebat e tonë...<br>
+        por po jap dhe firmën këtu 🖊️<br><br>
+        Të dua shumë Krric 💕
+      `;
+
       for (let i = 0; i < 50; i++) createHeart();
     }
 
