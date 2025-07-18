@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sq">
 <head>
-  <meta charset="UTF-8">
-  <title>Puzzle per Greis ❤️</title>
+  <meta charset="UTF-8" />
+  <title>Puzzle për Greis ❤️</title>
   <style>
     body {
       background: linear-gradient(to right, #ffdde1, #ee9ca7);
@@ -11,6 +11,8 @@
       align-items: center;
       font-family: 'Comic Sans MS', cursive, sans-serif;
       padding: 20px;
+      position: relative;
+      overflow-x: hidden;
     }
     h1 {
       color: #fff;
@@ -20,6 +22,7 @@
       margin-top: 20px;
       border: 5px dashed pink;
       border-radius: 15px;
+      background-color: white;
     }
     #video, #snapshot {
       margin-top: 20px;
@@ -31,16 +34,27 @@
       color: white;
       margin-top: 30px;
       text-align: center;
+      max-width: 400px;
     }
     .heart {
       position: absolute;
       color: red;
       font-size: 30px;
       animation: float 3s linear infinite;
+      user-select: none;
+      pointer-events: none;
     }
     @keyframes float {
       0% { transform: translateY(0); opacity: 1; }
       100% { transform: translateY(-600px); opacity: 0; }
+    }
+    iframe#music {
+      margin-top: 30px;
+      border: none;
+      width: 320px;
+      height: 180px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px pink;
     }
   </style>
 </head>
@@ -51,14 +65,21 @@
   <canvas id="snapshot" width="300" height="300"></canvas>
   <div id="message"></div>
 
-  <audio id="bgm" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+  <!-- Youtube embedded audio me autoplay, muted për lehtësim -->
+  <iframe
+    id="music"
+    src="https://www.youtube.com/embed/kPa7bsKwL-c?autoplay=1&mute=0&controls=1&loop=1&playlist=kPa7bsKwL-c"
+    allow="autoplay; encrypted-media"
+    allowfullscreen>
+  </iframe>
 
   <script>
     const canvas = document.getElementById('puzzle');
     const ctx = canvas.getContext('2d');
     const rows = 3, cols = 3;
     const img = new Image();
-    img.src = https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGVhEYWaff2RH_MrWZAOG02-sJ3hxJGHNB1A&s; // Ndrysho me nje foto tuaj
+    img.crossOrigin = "anonymous"; // për të shmangur probleme CORS në raste të tjera
+    img.src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGVhEYWaff2RH_MrWZAOG02-sJ3hxJGHNB1A&s";
 
     let pieces = [];
 
@@ -108,7 +129,7 @@
     }
 
     function onComplete() {
-      document.getElementById('bgm').play();
+      // Fsheh puzzle-n dhe tregon kamerën pas 3 sek
       setTimeout(() => {
         startCamera();
         setTimeout(() => capturePhoto(), 2000);
@@ -143,6 +164,7 @@
       const heart = document.createElement('div');
       heart.classList.add('heart');
       heart.style.left = Math.random() * window.innerWidth + 'px';
+      heart.style.top = (window.innerHeight - 50) + 'px';
       heart.innerText = '💖';
       document.body.appendChild(heart);
       setTimeout(() => heart.remove(), 3000);
