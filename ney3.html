@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+  <meta charset="UTF-8" />
+  <title>Puzzle për Krricin ❤️</title>
+  <style>
+    body {
+      background: linear-gradient(to right, #ffdde1, #ee9ca7);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+      animation: fadeIn 2s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    h1 {
+      color: white;
+      font-size: 30px;
+      text-shadow: 2px 2px 10px #000;
+      margin-bottom: 20px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    canvas {
+      margin-top: 15px;
+      border: 5px dashed pink;
+      border-radius: 15px;
+      background-color: white;
+      box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+    }
+
+    #video, #snapshot {
+      margin-top: 20px;
+      border-radius: 20px;
+      display: none;
+    }
+
+    #message {
+      font-size: 24px;
+      color: white;
+      margin-top: 30px;
+      text-align: center;
+      max-width: 400px;
+    }
+
+    .heart {
+      position: absolute;
+      color: red;
+      font-size: 30px;
+      animation: float 3s linear infinite;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-600px); opacity: 0; }
+    }
+
+    iframe#music {
+      margin-top: 20px;
+      border: none;
+      width: 0;
+      height: 0;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Plotësoje puzzle-n Krric ❤️</h1>
+
+  <canvas id="puzzle" width="300" height="300"></canvas>
+  <video id="video" width="300" height="300" autoplay></video>
+  <canvas id="snapshot" width="300" height="300" style="display:none; border: 3px solid #ff69b4; border-radius: 20px;"></canvas>
+  <div id="message"></div>
+
+  <iframe
+    id="music"
+    src="https://www.youtube.com/embed/kPa7bsKwL-c?autoplay=1&mute=0&controls=0&loop=1&playlist=kPa7bsKwL-c"
+    allow="autoplay"
+    allowfullscreen>
+  </iframe>
+
+  <script>
+    const canvas = document.getElementById('puzzle');
+    const ctx = canvas.getContext('2d');
+    const rows = 3, cols = 3;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGVhEYWaff2RH_MrWZAOG02-sJ3hxJGHNB1A&s";
+
+    let pieces = [];
+    let isComplete = false;
+
+    function shufflePieces() {
+      const w = canvas.width / cols;
+      const h = canvas.height / rows;
+      pieces = [];
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          pieces.push({
+            sx: x * w,
+            sy: y * h,
+            dx: Math.random() * (canvas.width - w),
+            dy: Math.random() * (canvas.height - h),
+            w, h
+          });
+        }
+      }
+      draw();
+    }
+
+    img.onload = shufflePieces;
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let p of pieces) {
+        ctx.drawImage(img, p.sx, p.sy, p.w, p.h, p.dx, p.dy, p.w, p.h);
+      }
+    }
+
+    canvas.addEventListener('click', (e) => {
+      if (isComplete) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      for (let p of pieces) {
+        if (mx > p.dx && mx < p.dx + p.w && my > p.dy && my < p.dy + p.h) {
+          p.dx = p.sx;
+          p.dy = p.sy;
+          break;
+        }
+      }
+      draw();
+      checkComplete();
+    });
+
+    function checkComplete() {
+      const done = pieces.every(p => Math.abs(p.dx - p.sx) < 1 && Math.abs(p.dy - p.sy) < 1);
+      if (done && !isComplete) {
+        isComplete = true;
+        onComplete();
+      }
+    }
+
+    function onComplete() {
+      // Ndalo ndërveprimin
+      canvas.style.pointerEvents = "none";
+      // Fshi puzzle dhe pastro ekranin
+      setTimeout(() => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.style.display = "none";
+        startCamera();
+      }, 1000);
+
+      // Muzika
+      document.getElementById('music').style.display = 'block';
+
+      // Bëj foton pas 4 sekondash
+      setTimeout(() => {
+        capturePhoto();
+      }, 4000);
+    }
+
+    function startCamera() {
+      const video = document.getElementById('video');
+      video.style.display = 'block';
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => video.srcObject = stream)
+        .catch(err => console.error('Gabim në kamerë:', err));
+    }
+
+    function capturePhoto() {
+      const video = document.getElementById('video');
+      const canvasSnap = document.getElementById('snapshot');
+      const ctxSnap = canvasSnap.getContext('2d');
+      ctxSnap.drawImage(video, 0, 0, canvasSnap.width, canvasSnap.height);
+      video.style.display = 'none';
+      canvasSnap.style.display = 'block';
+      showMessage();
+    }
+
+    function showMessage() {
+      const msg = document.getElementById('message');
+      msg.innerHTML = "<b>Krric ❤️<br>Më fal që ndonjëherë tregohem si derr...<br>Je gjithçka për mua 💖</b>";
+      for (let i = 0; i < 50; i++) createHeart();
+    }
+
+    function createHeart() {
+      const heart = document.createElement('div');
+      heart.classList.add('heart');
+      heart.style.left = Math.random() * window.innerWidth + 'px';
+      heart.style.top = (window.innerHeight - 50) + 'px';
+      heart.innerText = '💖';
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 3000);
+    }
+  </script>
+</body>
+</html>
