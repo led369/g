@@ -13,22 +13,41 @@
       padding: 20px;
       position: relative;
       overflow-x: hidden;
+      animation: fadeIn 2s ease-in;
     }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
     h1 {
-      color: #fff;
-      text-shadow: 2px 2px 5px #000;
+      color: white;
+      font-size: 32px;
+      text-shadow: 2px 2px 10px #000;
+      margin-bottom: 20px;
+      animation: pulse 2s infinite;
     }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
     canvas {
-      margin-top: 20px;
+      margin-top: 15px;
       border: 5px dashed pink;
       border-radius: 15px;
       background-color: white;
+      box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
     }
+
     #video, #snapshot {
       margin-top: 20px;
       border-radius: 20px;
       display: none;
     }
+
     #message {
       font-size: 24px;
       color: white;
@@ -36,6 +55,7 @@
       text-align: center;
       max-width: 400px;
     }
+
     .heart {
       position: absolute;
       color: red;
@@ -44,10 +64,12 @@
       user-select: none;
       pointer-events: none;
     }
+
     @keyframes float {
       0% { transform: translateY(0); opacity: 1; }
       100% { transform: translateY(-600px); opacity: 0; }
     }
+
     iframe#music {
       margin-top: 30px;
       border: none;
@@ -56,6 +78,7 @@
       border-radius: 15px;
       box-shadow: 0 0 10px pink;
     }
+
   </style>
 </head>
 <body>
@@ -65,7 +88,7 @@
   <canvas id="snapshot" width="300" height="300" style="display:none; border: 3px solid #ff69b4; border-radius: 20px;"></canvas>
   <div id="message"></div>
 
-  <!-- Muzika me YouTube iframe me autoplay -->
+  <!-- YouTube Video: gjithmonë hapet automatikisht -->
   <iframe
     id="music"
     src="https://www.youtube.com/embed/kPa7bsKwL-c?autoplay=1&mute=0&controls=1&loop=1&playlist=kPa7bsKwL-c"
@@ -78,14 +101,15 @@
     const ctx = canvas.getContext('2d');
     const rows = 3, cols = 3;
     const img = new Image();
-    img.crossOrigin = "anonymous"; 
+    img.crossOrigin = "anonymous";
     img.src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGVhEYWaff2RH_MrWZAOG02-sJ3hxJGHNB1A&s";
 
     let pieces = [];
 
-    img.onload = () => {
+    function shufflePieces() {
       const w = canvas.width / cols;
       const h = canvas.height / rows;
+      pieces = [];
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
           pieces.push({
@@ -93,13 +117,14 @@
             sy: y * h,
             dx: Math.random() * (canvas.width - w),
             dy: Math.random() * (canvas.height - h),
-            w,
-            h
+            w, h
           });
         }
       }
       draw();
-    };
+    }
+
+    img.onload = shufflePieces;
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -131,8 +156,8 @@
     function onComplete() {
       setTimeout(() => {
         startCamera();
-        setTimeout(() => capturePhoto(), 2000);
-      }, 3000);
+        setTimeout(() => capturePhoto(), 2500);
+      }, 2000);
     }
 
     function startCamera() {
